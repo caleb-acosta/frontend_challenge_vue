@@ -1,46 +1,46 @@
 <script>
+
 export default {
   name: 'Employee', // necessary for self-reference
   props: {
-    model: Object
-  },
+    model: Object // When created 'name' and 'type' values must be passed
+  }, 
   data() {
     return {
-      isOpen: false
+      showChildren: false,
+      showAdd: false,
+      profPic: this.$helper.profilePic()
     }
   }, 
   created() {
     if (this.isManager){
       this.changeType()
-    }
-  
+    } 
+    console.log(this.profPic + "")
     this.model.allocation = this.allocationByType(this.model.type)
-    this.$helper.allocation += this.allocationByType(this.model.type)
-    
+    this.$emit('update-allocation', this.model.allocation)
+    this.model.name = `${this.model.type} ${this.$helper.current_id}`
     this.$helper.current_id++
     this.model.id = this.$helper.current_id    
-
-    console.log(this.$helper)
+  },
+  unmounted() {
+    this.$emit('update-allocation', this.model.allocation * -1)
   },
   computed: {
     isManager() {
       return this.model.type == 'manager'
-    },
-    accumulatedAllocation() {
-      if (this.model.children){
-        let init_val = 0
-        return this.model.children.reduce(
-          (acc, child) => acc + child.allocation,
-          init_val) + this.model.allocation
-      }
-      return 0
     }
   },
   methods: { 
-    toggle() {
+    toggleChildren() {
       if (this.isManager) {
-        this.isOpen = !this.isOpen
+        this.showChildren = !this.showChildren
       }
+    },
+    toggleOptions() {
+      if (this.isManager) {
+        this.showAdd = !this.showAdd
+      } 
     },
     changeType() {
       this.model.children = []
@@ -56,17 +56,16 @@ export default {
       }
     },
     addChild(emp_type) { 
-      this.model.children.push(
-        {
-        name: `${emp_type} ${this.$helper.current_id}`,
-        type: emp_type
-      })
-      this.isOpen = true
+      this.model.children.push({type: emp_type})
+      this.showChildren = true
     },
     deleteChild(delete_id) {
-      this.$helper.allocation -= this.model.children.find(child => child.id == delete_id).allocation
-      this.model.children = this.model.children.filter(child => child.id != delete_id) 
-      console.log(this.$helper.allocation)
+      let to_delete = this.model.children.find(child => child.id == delete_id)
+      this.model.children = this.model.children.filter(child => child != to_delete)
+    },
+    updateAllocation(child_allocation) {
+       this.model.allocation += child_allocation
+       this.$emit('update-allocation', child_allocation)
     }
   }
 }
@@ -75,24 +74,36 @@ export default {
 <template>
   <li>
     <div
-      class="employee-box"
-      :class="{ bold: isManager }"
-      @dblclick="changeType"
-      @click.shift="$emit('delete-child', this.model.id)">
-      {{ model.name }} 
-      <div v-if="isManager">
-        <button class="add" @click="addChild('developer')">D</button>
-        <button class="add" @click="addChild('manager')">M</button>
-        <button class="add" @click="addChild('qa')">Q</button>
-        ${{ accumulatedAllocation }}
-        <span @click="toggle" class="toggle">{{ isOpen ? '-' : '+' }}</span>
+      class="employee"
+      :class="{man: model.type == 'manager', dev: model.type == 'developer', qa: model.type == 'qa'}">
+      <div class="employee-info">
+        <img class="prof-pic" :src="profPic">
+        <span class="name">{{ model.name }}</span>
+        <span>$ {{ model.allocation }}</span>
+        <font-awesome-icon 
+          @click="toggleChildren" 
+          v-if="isManager" 
+          :icon=" showChildren ? 'fa-arrow-up' : 'fa-arrow-down'"/>
+        <font-awesome-icon
+          @click="$emit('delete-child', this.model.id)"
+          icon="fa-solid fa-user-minus"/>
+        <font-awesome-icon
+          @click="toggleOptions" 
+          v-if="isManager"
+          icon="fa-solid fa-user-plus"/>
+      </div> 
+      <div v-if="isManager" v-show="showAdd" class="add-buttons">
+        <button @click="addChild('developer')">Dev</button>
+        <button @click="addChild('manager')">Manager</button>
+        <button @click="addChild('qa')">QA</button>
       </div>
     </div>
-    <ul v-show="isOpen" v-if="isManager">
+    <ul v-show="showChildren" v-if="isManager">
       <Employee
         class="item"
         v-for="model in model.children"
         :model="model"
+        @update-allocation="updateAllocation"
         @delete-child="deleteChild">
       </Employee>
     </ul>
@@ -100,42 +111,68 @@ export default {
 </template>
 
 <style>
-.employee-box {
-  background-color: white;
-  padding: 10px;
-  border: 3px solid #2A9D8F;
-  border-radius: 4px;
-  margin-left: 10px;
-  margin-top: 10px;
-  width: 250px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  font-weight: bold;
-  align-items: center;
-}
- 
-.add {
-  background-color: #E9C46A;
-  border: 3px solid #E76F51;
-  padding: 3px;
-  margin: 4px;
-  color: #264653;
-  font-weight: bold;
-  border-radius: 4px;
+.employee {
+    background-color: white;
+    width: 400px;
+    margin-top: 20px;
+    font-family: Verdana, sans-serif;
+    border-radius: 10px;
 }
 
-.toggle{
-  background-color: #2A9D8F;
-  border:  3px solid #E76F51;
-  font-weight: bold;
-  padding: 3px;
-  color: white;
+.dev {
+    box-shadow: 0px -6px #3A0CA3, 2px 2px 10px black;
+
 }
 
-li::marker {
-  color: #E76F51;
-  font-size: 4em;
-  content: "=>";
+.qa {
+    box-shadow: 0px -6px #4361EE, 2px 2px 10px black;
+}
+  
+.man {
+    box-shadow: 0px -6px #4CC9F0, 2px 2px 10px black;
+}
+
+.employee div {
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 0 8px 0;
+    align-items: center;
+}
+
+.employee-info * {
+    margin: 0 8px 0 8px;
+}
+
+.employee-info button {
+    background-color: #F72585;
+    color: white;
+    padding: 6px;
+    border: none;
+    border-radius: 4px;
+    
+}
+
+.prof-pic {
+    border-radius: 100%;
+    border: 3px solid #F72585;
+    object-fit: cover;
+    width: 50px;
+    height: 50px;
+}
+
+.add-buttons button {
+    background-color: #F72585;
+    color: white;
+    border: none;
+    font-weight: bold;
+    width: 100%;
+    height: 32px;
+    margin: 0;
+    border: 1px solid white;
+}
+
+.name {
+    font-weight: bold;
+    margin-right: auto;
 }
 </style>
