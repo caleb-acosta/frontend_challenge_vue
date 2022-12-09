@@ -15,15 +15,11 @@ export default {
     if (this.isManager) {
       this.changeType();
     }
-    console.log(this.profPic + "");
     this.model.allocation = this.allocationByType(this.model.type);
     this.$emit("update-allocation", this.model.allocation);
     this.model.name = `${this.model.type} ${this.$helper.current_id}`;
-    this.$helper.current_id++;
     this.model.id = this.$helper.current_id;
-  },
-  unmounted() {
-    this.$emit("update-allocation", this.model.allocation * -1);
+    this.$helper.current_id++;
   },
   computed: {
     isManager() {
@@ -59,12 +55,14 @@ export default {
       this.showChildren = true;
     },
     deleteChild(delete_id) {
-      let to_delete = this.model.children.find(
+      let delete_model = this.model.children.find(
         (child) => child.id == delete_id
       );
+      this.model.allocation -= delete_model.allocation;
       this.model.children = this.model.children.filter(
-        (child) => child != to_delete
+        (child) => child != delete_model
       );
+      this.$emit("update-allocation", delete_model.allocation);
     },
     updateAllocation(child_allocation) {
       this.model.allocation += child_allocation;

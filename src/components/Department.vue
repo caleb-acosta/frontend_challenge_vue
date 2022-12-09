@@ -12,7 +12,6 @@ export default {
   },
   computed: {
     totalAllocation() {
-      //return this.dep.length
       let init = 0;
       return this.dep.reduce((acc, emp) => acc + emp.allocation, init);
     },
@@ -22,7 +21,12 @@ export default {
       this.dep.push({ type: "manager" });
     },
     deleteManager(manager_id) {
+      this.dep.find((child) => child.id == manager_id).children = [];
+      console.log(this.dep);
       this.dep = this.dep.filter((child) => child.id != manager_id);
+    },
+    updateAllocation() {
+      return 0;
     },
   },
 };
@@ -40,6 +44,7 @@ export default {
           v-for="emp in dep"
           :model="emp"
           @delete-child="deleteManager"
+          @update-allocation="updateAllocation"
         ></Employee>
       </ul>
     </div>

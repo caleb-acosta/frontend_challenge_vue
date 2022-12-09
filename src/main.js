@@ -21,7 +21,7 @@ const app = createApp(App);
 app.config.globalProperties.$helper = {
   current_id: 0,
   profilePic() {
-    let rnd_num = Math.floor(Math.random() * 12) + 1;
+    let rnd_num = Math.floor(Math.random() * 11) + 1;
     return "img/img" + rnd_num + ".jpeg";
   },
 };
