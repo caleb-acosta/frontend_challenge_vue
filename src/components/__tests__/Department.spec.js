@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { mount } from "@vue/test-utils";
-import Department from "../Department.vue";
+import DepartmentContainer from "../DepartmentContainer.vue";
 
 describe("Department Component", () => {
   it("calculates the right total allocation when add or delete children", async () => {
@@ -27,7 +27,7 @@ describe("Department Component", () => {
 });
 
 function createWrapper() {
-  return mount(Department, {
+  return mount(DepartmentContainer, {
     global: {
       mocks: {
         $helper: {
