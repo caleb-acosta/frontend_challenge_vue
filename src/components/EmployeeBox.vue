@@ -1,14 +1,15 @@
 <script>
 export default {
-  name: "Employee", // necessary for self-reference
+  name: "EmployeeBox", // necessary for self-reference
   props: {
-    model: Object, // When created 'name' and 'type' values must be passed
+    mod: Object, // When created 'id' and 'type' values must be passed
   },
   data() {
     return {
       showChildren: false,
       showAdd: false,
       profPic: this.$helper.profilePic(),
+      model: this.mod,
     };
   },
   created() {
@@ -17,12 +18,11 @@ export default {
     }
     this.model.allocation = this.allocationByType(this.model.type);
     this.$emit("update-allocation", this.model.allocation);
-    this.model.name = `${this.model.type} ${this.$helper.current_id}`;
-    this.model.id = this.$helper.current_id;
-    this.$helper.current_id++;
+    this.model.name = `${this.model.type} ${this.model.id}`;
   },
   computed: {
     isManager() {
+      console.log(this.model);
       return this.model.type == "manager";
     },
   },
@@ -51,7 +51,8 @@ export default {
       }
     },
     addChild(emp_type) {
-      this.model.children.push({ type: emp_type });
+      this.model.children.push({ type: emp_type, id: this.$helper.current_id });
+      this.$helper.current_id++;
       this.showChildren = true;
     },
     deleteChild(delete_id) {
@@ -108,14 +109,15 @@ export default {
       </div>
     </div>
     <ul v-show="showChildren" v-if="isManager">
-      <Employee
+      <EmployeeBox
         class="item"
-        v-for="model in model.children"
-        :model="model"
+        v-for="emp in model.children"
+        :mod="emp"
+        :key="emp.id"
         @update-allocation="updateAllocation"
         @delete-child="deleteChild"
       >
-      </Employee>
+      </EmployeeBox>
     </ul>
   </li>
 </template>

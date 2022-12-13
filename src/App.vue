@@ -1,9 +1,9 @@
 <script>
-import Department from "./components/Department.vue";
+import DepartmentContainer from "./components/DepartmentContainer.vue";
 
 export default {
   components: {
-    Department,
+    DepartmentContainer,
   },
   data() {
     return {};
@@ -16,7 +16,7 @@ export default {
     <h2>Frontend Challenge</h2>
     <div class="gradient"></div>
   </header>
-  <Department></Department>
+  <DepartmentContainer></DepartmentContainer>
 </template>
 
 <style>

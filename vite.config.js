@@ -8,8 +8,8 @@ export default defineConfig({
   base: "/frontend_challenge_vue/",
   test: {
     coverage: {
-      provider: 'istanbul'
-    }
+      provider: "istanbul",
+    },
   },
   plugins: [vue()],
   resolve: {

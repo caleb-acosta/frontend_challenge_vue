@@ -1,9 +1,9 @@
 <script>
-import Employee from "./Employee.vue";
+import EmployeeBox from "./EmployeeBox.vue";
 
 export default {
   components: {
-    Employee,
+    EmployeeBox,
   },
   data() {
     return {
@@ -18,7 +18,9 @@ export default {
   },
   methods: {
     addManager() {
-      this.dep.push({ type: "manager" });
+      this.dep.push({ type: "manager", id: this.$helper.current_id });
+      this.$helper.current_id++;
+      console.log(this.dep);
     },
     deleteManager(manager_id) {
       this.dep.find((child) => child.id == manager_id).children = [];
@@ -40,12 +42,13 @@ export default {
     </div>
     <div class="department">
       <ul>
-        <Employee
+        <EmployeeBox
           v-for="emp in dep"
-          :model="emp"
+          :mod="emp"
+          :key="emp.id"
           @delete-child="deleteManager"
           @update-allocation="updateAllocation"
-        ></Employee>
+        ></EmployeeBox>
       </ul>
     </div>
   </div>
