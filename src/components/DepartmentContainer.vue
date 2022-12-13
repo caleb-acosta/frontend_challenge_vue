@@ -53,26 +53,3 @@ export default {
     </div>
   </div>
 </template>
-
-<style>
-.department {
-  width: 80%;
-  min-height: 100%;
-  margin-left: 10%;
-}
-
-.info {
-  display: flex;
-  justify-content: space-around;
-  padding: 8px;
-}
-
-.add-main {
-  background-color: #f72585;
-  border: none;
-  color: white;
-  padding: 8px;
-  border-radius: 8px;
-  font-weight: bold;
-}
-</style>
