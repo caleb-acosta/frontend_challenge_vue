@@ -7,6 +7,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "test:unit": "vitest --environment jsdom --root src/",
+    "test:coverage": "vitest run --environment jsdom --coverage",
+    "test:ui": "vitest --environment jsdom --coverage --ui",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },
   "dependencies": {
@@ -19,6 +21,8 @@
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.1.4",
     "@vitejs/plugin-vue": "^3.2.0",
+    "@vitest/coverage-c8": "^0.25.7",
+    "@vitest/coverage-istanbul": "^0.25.8",
     "@vue/eslint-config-prettier": "^7.0.0",
     "@vue/test-utils": "^2.2.4",
     "eslint": "^8.22.0",
