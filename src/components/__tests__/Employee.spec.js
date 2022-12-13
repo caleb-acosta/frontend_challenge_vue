@@ -1,66 +1,44 @@
 import { describe, it, expect } from "vitest";
-import { shallowMount, mount } from "@vue/test-utils";
-import Employee from "../Employee.vue";
+import { mount } from "@vue/test-utils";
+import EmployeeBox from "../EmployeeBox.vue";
 
 describe("Employee Component", () => {
-  it("auto-assigns an ID when created", () => {
-    const id = 0;
-    const wrapper = shallowMount(Employee, {
-      global: {
-        mocks: {
-          $helper: {
-            current_id: id,
-            profilePic() {
-              "";
-            },
-          },
-        },
-        stubs: { FontAwesomeIcon: true },
-      },
-      props: {
-        model: { type: "manager" },
-      },
-    });
+  it("manager can add children of different types", async () => {
+    const wrapper = createWrapper("manager");
+    await wrapper.findAll("[icon]")[2].trigger("click");
 
-    expect(wrapper.props().model.name).toMatch(`manager ${id}`);
-    expect(wrapper.props().model.id).toBe(id);
-  }),
-    it("manager can add children of different types", async () => {
-      const wrapper = createWrapper("manager");
-      await wrapper.findAll("[icon]")[2].trigger("click");
+    expect(wrapper.vm.model.allocation).toBe(300);
 
-      expect(wrapper.props().model.allocation).toBe(300);
+    // Add dev
+    await wrapper.findAll(".add-buttons > button")[0].trigger("click");
+    expect(wrapper.vm.model.allocation).toBe(1300);
 
-      // Add dev
-      await wrapper.findAll(".add-buttons > button")[0].trigger("click");
-      expect(wrapper.props().model.allocation).toBe(1300);
+    // Add Manager
+    await wrapper.findAll(".add-buttons > button")[1].trigger("click");
+    expect(wrapper.vm.model.allocation).toBe(1600);
 
-      // Add Manager
-      await wrapper.findAll(".add-buttons > button")[1].trigger("click");
-      expect(wrapper.props().model.allocation).toBe(1600);
+    // Add QA
+    await wrapper.findAll(".add-buttons > button")[2].trigger("click");
+    expect(wrapper.vm.model.allocation).toBe(2100);
 
-      // Add QA
-      await wrapper.findAll(".add-buttons > button")[2].trigger("click");
-      expect(wrapper.props().model.allocation).toBe(2100);
-
-      expect(wrapper.props().model.children.length).toBe(3);
-    });
+    expect(wrapper.vm.model.children.length).toBe(3);
+  });
 
   it("manager deletes children", async () => {
     const wrapper = createWrapper("manager");
     await wrapper.findAll("[icon]")[2].trigger("click");
 
-    expect(wrapper.props().model.allocation).toBe(300);
+    expect(wrapper.vm.model.allocation).toBe(300);
 
     // Add dev
     await wrapper.findAll(".add-buttons > button")[0].trigger("click");
-    expect(wrapper.props().model.children.length).toBe(1);
-    expect(wrapper.props().model.allocation).toBe(1300);
+    expect(wrapper.vm.model.children.length).toBe(1);
+    expect(wrapper.vm.model.allocation).toBe(1300);
 
     //Delete dev
     await wrapper.findAll(".dev > .employee-info > [icon]")[0].trigger("click");
-    expect(wrapper.props().model.children.length).toBe(0);
-    expect(wrapper.props().model.allocation).toBe(300);
+    expect(wrapper.vm.model.children.length).toBe(0);
+    expect(wrapper.vm.model.allocation).toBe(300);
   }),
     it("shows and hides the manager buttons", async () => {
       const wrapper = createWrapper("manager");
@@ -101,12 +79,12 @@ describe("Employee Component", () => {
 });
 
 function createWrapper(emp_type) {
-  const manager_model = { type: emp_type };
-  return mount(Employee, {
+  const manager_model = { type: emp_type, id: 0 };
+  return mount(EmployeeBox, {
     global: {
       mocks: {
         $helper: {
-          current_id: 0,
+          current_id: 1,
           profilePic() {
             "";
           },
@@ -115,7 +93,7 @@ function createWrapper(emp_type) {
       stubs: { FontAwesomeIcon: true },
     },
     props: {
-      model: manager_model,
+      mod: manager_model,
     },
   });
 }
